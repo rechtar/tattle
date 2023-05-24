@@ -13,6 +13,7 @@ import {
 import { selectMe, loadCachedUser } from "src/features/global/globalSlice";
 import brainIcon from "src/assets/brain.svg";
 import wonderingIcon from "src/assets/wondering.svg";
+import { i18n } from "src/app/translations";
 
 const AppContainer = styled("div")`
   display: flex;
@@ -106,7 +107,10 @@ function ChatContent({ chatId }) {
     ? messages.concat({
         id: "LAST",
         created_at: Date.now(),
-        content: { content: lastMessage + " (sending...)", role: "user" },
+        content: {
+          content: lastMessage + i18n.t("general.sending"),
+          role: "user",
+        },
       })
     : messages;
 
@@ -144,7 +148,7 @@ function ChatContent({ chatId }) {
             onChange={(e) => setMessageInput(e.target.value)}
             rightElement={
               <Button
-                text="Send"
+                text={i18n.t("general.send")}
                 type="submit"
                 disabled={!messageInput.trim()}
                 intent={messageInput.trim() ? "primary" : "none"}

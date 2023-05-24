@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "src/app/constants";
+import { i18n } from "src/app/translations";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
@@ -26,7 +27,9 @@ export const apiSlice = createApi({
     }),
 
     createChat: builder.mutation({
-      query: (title = "My chat " + new Date().toLocaleDateString()) => ({
+      query: (
+        title = i18n.t("general.my_chat") + new Date().toLocaleDateString()
+      ) => ({
         method: "POST",
         url: "/chat",
         body: { content: { title } },
