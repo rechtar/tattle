@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { styled, css } from "goober";
-import { Classes, Button, ControlGroup, InputGroup } from "@blueprintjs/core";
+import {
+  Classes,
+  Button,
+  ControlGroup,
+  InputGroup,
+  Icon,
+} from "@blueprintjs/core";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -10,75 +15,30 @@ import {
   useGetMessagesQuery,
   useCreateMessageMutation,
 } from "src/features/api/apiSlice";
-import { selectMe, loadCachedUser } from "src/features/global/globalSlice";
+import {
+  selectMe,
+  loadCachedUser,
+  selectSelectedChat,
+  setSelectedChat,
+} from "src/features/global/globalSlice";
 import brainIcon from "src/assets/brain.svg";
 import wonderingIcon from "src/assets/wondering.svg";
 import { i18n } from "src/app/translations";
-
-const AppContainer = styled("div")`
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-`;
-const Panel = styled("div")`
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  background: #333;
-  border-radius: 2px;
-  margin: 10px;
-  padding: 10px;
-`;
-const SidePanel = styled(Panel)`
-  width: 300px;
-  flex-shrink: 0;
-  margin-right: 0;
-`;
-const MainPanel = styled(Panel)`
-  flex-grow: 1;
-`;
-const PlaceholderTop = styled("div")`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-`;
-const ChatMessageViewport = styled("div")`
-  flex-grow: 1;
-  overflow-y: scroll;
-  margin-bottom: 10px;
-`;
-const ChatMessageTop = styled("div")`
-  &:not(:first-child) {
-    margin-top: 10px;
-  }
-  margin-bottom: 10px;
-  display: flex;
-`;
-const ChatMessageAvatar = styled("div")`
-  width: 30px;
-  height: 30px;
-  background: #777777;
-  border-radius: 15px;
-  margin-right: 10px;
-  flex-shrink: 0;
-`;
-const ChatMessageHead = styled("div")`
-  margin-bottom: 10px;
-`;
-const ChatMessageBody = styled("div")`
-  background: #555555;
-  padding: 10px;
-  border-radius: 8px;
-`;
-
-const marginLarge = css`
-  margin-bottom: 20px;
-`;
-const marginSmall = css`
-  margin-bottom: 10px;
-`;
+import { useIsMobile } from "src/hooks";
+import {
+  AppContainer,
+  SidePanel,
+  MainPanel,
+  PlaceholderTop,
+  ChatMessageViewport,
+  ChatMessageTop,
+  ChatMessageAvatar,
+  ChatMessageHead,
+  ChatMessageBody,
+  marginLarge,
+  marginSmall,
+  TitleWrapper,
+} from "./styles";
 
 function ChatContentPlaceholder() {
   return (
@@ -184,10 +144,12 @@ function ChatMessage({ message }) {
 }
 
 function App() {
+  const { isMobile } = useIsMobile();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { chatId } = useParams();
   const me = useSelector(selectMe);
+  const selectedChat = useSelector(selectSelectedChat);
   const {
     data: chats = [],
     isLoading,
@@ -213,7 +175,7 @@ function App() {
 
   return (
     <AppContainer className={Classes.DARK}>
-      <SidePanel>
+      <SidePanel isMobile={isMobile} isHidden={isMobile && chatId}>
         <Button
           intent="success"
           className={marginLarge}
@@ -233,12 +195,26 @@ function App() {
               ].join(" ")
             }
             to={"/chat/" + convo.id}
+            onClick={() => {
+              dispatch(
+                setSelectedChat({ title: convo.content.title, id: convo.id })
+              );
+            }}
           >
             {convo.content.title}
           </NavLink>
         ))}
       </SidePanel>
-      <MainPanel>
+
+      <MainPanel isHidden={isMobile && !chatId}>
+        {isMobile && (
+          <TitleWrapper>
+            <NavLink to={"/"} className={Classes.BREADCRUMB}>
+              <Icon icon="chevron-left" />
+              {selectedChat.name}
+            </NavLink>
+          </TitleWrapper>
+        )}
         {me?.id && chatId ? (
           <ChatContent chatId={chatId} />
         ) : (
