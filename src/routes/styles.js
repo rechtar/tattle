@@ -18,11 +18,11 @@ export const Panel = styled("div")`
 export const SidePanel = styled(Panel)((props) => ({
   width: props.isMobile ? `calc(100% - 20px)` : "300px",
   flexShrink: 0,
-  display: props.hide ? "none" : "?",
+  display: props.isHidden ? "none" : "?",
 }));
 export const MainPanel = styled(Panel)((props) => ({
   flexGrow: 1,
-  display: props.hide ? "none" : "?",
+  display: props.isHidden ? "none" : "?",
 }));
 export const PlaceholderTop = styled("div")`
   display: flex;

@@ -1,6 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { Classes, Button, ControlGroup, InputGroup } from "@blueprintjs/core";
+import {
+  Classes,
+  Button,
+  ControlGroup,
+  InputGroup,
+  Icon,
+} from "@blueprintjs/core";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -12,8 +18,8 @@ import {
 import {
   selectMe,
   loadCachedUser,
-  getSelectedChat,
-  setSelectecChat,
+  selectSelectedChat,
+  setSelectedChat,
 } from "src/features/global/globalSlice";
 import brainIcon from "src/assets/brain.svg";
 import wonderingIcon from "src/assets/wondering.svg";
@@ -143,7 +149,7 @@ function App() {
   const navigate = useNavigate();
   const { chatId } = useParams();
   const me = useSelector(selectMe);
-  const selectedChat = useSelector(getSelectedChat);
+  const selectedChat = useSelector(selectSelectedChat);
   const {
     data: chats = [],
     isLoading,
@@ -169,7 +175,7 @@ function App() {
 
   return (
     <AppContainer className={Classes.DARK}>
-      <SidePanel isMobile={isMobile} hide={isMobile && chatId}>
+      <SidePanel isMobile={isMobile} isHidden={isMobile && chatId}>
         <Button
           intent="success"
           className={marginLarge}
@@ -191,7 +197,7 @@ function App() {
             to={"/chat/" + convo.id}
             onClick={() => {
               dispatch(
-                setSelectecChat({ title: convo.content.title, id: convo.id })
+                setSelectedChat({ title: convo.content.title, id: convo.id })
               );
             }}
           >
@@ -200,15 +206,13 @@ function App() {
         ))}
       </SidePanel>
 
-      <MainPanel hide={isMobile && !chatId}>
+      <MainPanel isHidden={isMobile && !chatId}>
         {isMobile && (
           <TitleWrapper>
-            <Button
-              icon="chevron-left"
-              onClick={() => navigate("/")}
-              style={{ marginRight: "10px" }}
-            />
-            {selectedChat.name}
+            <NavLink to={"/"} className={Classes.BREADCRUMB}>
+              <Icon icon="chevron-left" />
+              {selectedChat.name}
+            </NavLink>
           </TitleWrapper>
         )}
         {me?.id && chatId ? (

@@ -62,7 +62,7 @@ export const globalSlice = createSlice({
     incrementByAmount: (state, action) => {
       state.value += action.payload;
     },
-    setSelectecChat: (state, action) => {
+    setSelectedChat: (state, action) => {
       state.selectedChat.name = action.payload.title;
       state.selectedChat.id = action.payload.id;
     },
@@ -86,10 +86,10 @@ export const globalSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount, setSelectecChat } =
+export const { increment, decrement, incrementByAmount, setSelectedChat } =
   globalSlice.actions;
 
 export default globalSlice.reducer;
 export const selectGlobal = (state) => state.global;
 export const selectMe = (state) => state.global.me;
-export const getSelectedChat = (state) => state.global.selectedChat;
+export const selectSelectedChat = (state) => state.global.selectedChat;
