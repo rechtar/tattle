@@ -163,10 +163,6 @@ function App() {
     }
   }, [me, navigate, dispatch]);
 
-  useEffect(() => {
-    console.log(isMobile);
-  }, [isMobile]);
-
   function handleNewChat() {
     createChat();
   }
