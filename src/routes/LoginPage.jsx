@@ -11,6 +11,7 @@ import {
 } from "@blueprintjs/core";
 import { styled } from "goober";
 import { login, register } from "src/features/global/globalSlice";
+import { i18n } from "src/app/translations";
 
 const Panel = styled("form")`
   min-width: 300px;
@@ -33,14 +34,14 @@ export function LoginPanel() {
 
   return (
     <Panel onSubmit={handleSubmit}>
-      <FormGroup label="Username" labelFor="text-input">
+      <FormGroup label={i18n.t("auth.username")} labelFor="text-input">
         <InputGroup
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
         />
       </FormGroup>
-      <FormGroup label="Password" labelFor="text-input">
+      <FormGroup label={i18n.t("auth.password")} labelFor="text-input">
         <InputGroup
           type="password"
           value={password}
@@ -49,7 +50,7 @@ export function LoginPanel() {
         />
       </FormGroup>
       <FormGroup>
-        <Button type="submit" text="Log in" intent="primary" />
+        <Button type="submit" text={i18n.t("auth.login")} intent="primary" />
       </FormGroup>
     </Panel>
   );
@@ -72,9 +73,9 @@ export function SignupPanel() {
   return (
     <Panel onSubmit={handleSubmit}>
       <FormGroup
-        label="Username"
+        label={i18n.t("auth.username")}
         labelFor="text-input"
-        labelInfo="(alphanumeric)"
+        labelInfo={i18n.t("auth.alphanumeric")}
       >
         <InputGroup
           value={username}
@@ -83,9 +84,9 @@ export function SignupPanel() {
         />
       </FormGroup>
       <FormGroup
-        label="Password"
+        label={i18n.t("auth.password")}
         labelFor="text-input"
-        labelInfo="(8 digits minimum)"
+        labelInfo={i18n.t("auth.eight_digits_mininum")}
       >
         <InputGroup
           type="password"
@@ -94,7 +95,7 @@ export function SignupPanel() {
           autoComplete="new-password"
         />
       </FormGroup>
-      <FormGroup label="Confirm password" labelFor="text-input">
+      <FormGroup label={i18n.t("auth.confirm_password")} labelFor="text-input">
         <InputGroup
           type="password"
           value={password2}
@@ -103,7 +104,7 @@ export function SignupPanel() {
         />
       </FormGroup>
       <FormGroup>
-        <Button text="Sign up" intent="success" type="submit" />
+        <Button text={i18n.t("auth.signup")} intent="success" type="submit" />
       </FormGroup>
     </Panel>
   );
@@ -119,8 +120,12 @@ export default function LoginPage() {
   return (
     <div className={Classes.DARK}>
       <Tabs onChange={handleTabChange} selectedTabId={selectedTab}>
-        <Tab id="login" title="Log in" panel={<LoginPanel />} />
-        <Tab id="signup" title="Sign up" panel={<SignupPanel />} />
+        <Tab id="login" title={i18n.t("auth.login")} panel={<LoginPanel />} />
+        <Tab
+          id="signup"
+          title={i18n.t("auth.signup")}
+          panel={<SignupPanel />}
+        />
       </Tabs>
     </div>
   );

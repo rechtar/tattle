@@ -43,8 +43,8 @@ import {
 function ChatContentPlaceholder() {
   return (
     <PlaceholderTop>
-      <div>Welcome to Chat+</div> <br />
-      <div>Select a chat to get started</div>
+      <div>{i18n.t("general.welcome")}</div> <br />
+      <div>{i18n.t("general.welcome2")}</div>
     </PlaceholderTop>
   );
 }
@@ -181,7 +181,7 @@ function App() {
           className={marginLarge}
           onClick={handleNewChat}
         >
-          New chat
+          {i18n.t("general.new_chat")}
         </Button>
         {(chats || []).map((convo) => (
           <NavLink

@@ -3,7 +3,8 @@
 @import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, "Microsoft Jhenghei",
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -34,6 +35,8 @@ body {
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, "Microsoft Jhenghei",
+    sans-serif;
 }
 
 h1 {
