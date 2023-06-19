@@ -1,6 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { SSE } from "sse.js";
 import { BASE_URL } from "src/app/constants";
 import { i18n } from "src/app/translations";
+import {
+  setPartialResponse,
+  setPartialResponseStreaming,
+} from "src/features/global/globalSlice";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
@@ -58,6 +63,98 @@ export const apiSlice = createApi({
         { type: "Message@" + arg.chatId, id: "LIST" },
       ],
     }),
+
+    submitResponse: builder.mutation({
+      query: ({ chatId, message }) => ({
+        method: "POST",
+        url: `/chat/${chatId}/submit`,
+        body: { content: { content: message } },
+      }),
+      transformResponse: (response) => response.data,
+      invalidatesTags: (result, error, arg) => [
+        { type: "Message@" + arg.chatId, id: "LIST" },
+      ],
+    }),
+
+    createMessageAndStream: builder.mutation({
+      queryFn: () => ({ data: "" }),
+      async onCacheEntryAdded(
+        { chatId, message },
+        {
+          getState,
+          dispatch,
+          updateCachedData,
+          cacheDataLoaded,
+          cacheEntryRemoved,
+        }
+      ) {
+        try {
+          await cacheDataLoaded;
+
+          const source = new SSE(`${BASE_URL}/chat/${chatId}/stream`, {
+            method: "POST",
+            // cache: "no-cache",
+            // keepalive: true,
+            headers: {
+              Authorization: `Bearer ${getState().global.me.token}`,
+              Accept: "text/event-stream",
+              "Content-Type": "application/json",
+            },
+            payload: JSON.stringify({ content: { content: message } }),
+          });
+
+          dispatch(
+            setPartialResponse({
+              chatId,
+              content: null,
+            })
+          );
+
+          dispatch(
+            setPartialResponseStreaming({
+              chatId,
+              isStreaming: true,
+            })
+          );
+
+          const SSE_TERMINATOR = "[DONE]";
+          source.onmessage = (event) => {
+            if (event.data !== SSE_TERMINATOR) {
+              try {
+                const parsed = JSON.parse(event.data);
+                const line = parsed.choices[0].delta.content;
+                if (!line) return;
+                dispatch(
+                  setPartialResponse({
+                    chatId,
+                    content:
+                      (getState().global.partialResponses[chatId] || "") + line,
+                  })
+                );
+              } catch (e) {
+                console.warn("Cannot parse", e);
+              }
+            } else {
+              dispatch(
+                setPartialResponseStreaming({
+                  chatId,
+                  isStreaming: false,
+                })
+              );
+            }
+          };
+          source.stream();
+        } catch (e) {
+          console.warn(e);
+          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
+          // in which case `cacheDataLoaded` will throw
+        }
+        await cacheEntryRemoved;
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: "Message@" + arg.chatId, id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -67,4 +164,6 @@ export const {
   useCreateChatMutation,
   useGetMessagesQuery,
   useCreateMessageMutation,
+  useSubmitResponseMutation,
+  useCreateMessageAndStreamMutation,
 } = apiSlice;

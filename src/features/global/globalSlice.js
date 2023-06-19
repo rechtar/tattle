@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { omit } from "lodash";
 import { BASE_URL } from "src/app/constants";
 
 export const loadCachedUser = createAsyncThunk(
@@ -47,6 +48,8 @@ export const globalSlice = createSlice({
   initialState: {
     me: {},
     selectedChat: {},
+    partialResponses: {},
+    partialResponseStreaming: {},
   },
   reducers: {
     increment: (state) => {
@@ -69,6 +72,25 @@ export const globalSlice = createSlice({
     removeSelectedChat: (state) => {
       state.selectedChat = {};
     },
+    setPartialResponse: (state, action) => {
+      const { chatId, content } = action.payload;
+      if (content === null) {
+        state.partialResponses = omit(state.partialResponses, chatId);
+      } else {
+        state.partialResponses[chatId] = content;
+      }
+    },
+    setPartialResponseStreaming: (state, action) => {
+      const { chatId, isStreaming } = action.payload;
+      if (isStreaming) {
+        state.partialResponseStreaming[chatId] = true;
+      } else {
+        state.partialResponseStreaming = omit(
+          state.partialResponseStreaming,
+          chatId
+        );
+      }
+    },
   },
   extraReducers(builder) {
     builder.addCase(login.fulfilled, (state, action) => {
@@ -86,10 +108,19 @@ export const globalSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount, setSelectedChat } =
-  globalSlice.actions;
+export const {
+  increment,
+  decrement,
+  incrementByAmount,
+  setSelectedChat,
+  setPartialResponse,
+  setPartialResponseStreaming,
+} = globalSlice.actions;
 
 export default globalSlice.reducer;
 export const selectGlobal = (state) => state.global;
 export const selectMe = (state) => state.global.me;
 export const selectSelectedChat = (state) => state.global.selectedChat;
+export const selectPartialResponses = (state) => state.global.partialResponses;
+export const selectPartialResponseStreaming = (state) =>
+  state.global.partialResponseStreaming;

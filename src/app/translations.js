@@ -43,4 +43,5 @@ const translations = {
 
 export const i18n = new I18n(translations);
 i18n.locale = navigator.language || "en";
+// i18n.locale = "zh";
 i18n.enableFallback = true;

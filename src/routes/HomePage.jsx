@@ -14,12 +14,17 @@ import {
   useCreateChatMutation,
   useGetMessagesQuery,
   useCreateMessageMutation,
+  useCreateMessageAndStreamMutation,
+  useSubmitResponseMutation,
 } from "src/features/api/apiSlice";
 import {
   selectMe,
   loadCachedUser,
   selectSelectedChat,
   setSelectedChat,
+  setPartialResponse,
+  selectPartialResponses,
+  selectPartialResponseStreaming,
 } from "src/features/global/globalSlice";
 import brainIcon from "src/assets/brain.svg";
 import wonderingIcon from "src/assets/wondering.svg";
@@ -51,8 +56,11 @@ function ChatContentPlaceholder() {
 
 function ChatContent({ chatId }) {
   const bottomRef = useRef();
+  const dispatch = useDispatch();
+
   const [messageInput, setMessageInput] = useState("");
   const [lastMessage, setLastMessage] = useState("");
+  const [isScrollLocked, setScrollLocked] = useState(false);
   const clearLastMessage = () => setLastMessage("");
   const {
     data: messages = [],
@@ -61,33 +69,85 @@ function ChatContent({ chatId }) {
     isFetching,
     error,
   } = useGetMessagesQuery(chatId);
-  const [createMessage] = useCreateMessageMutation();
+  // const [createMessage] = useCreateMessageMutation();
+  const [submitResponse] = useSubmitResponseMutation();
+  const [createMessageAndStream, responseStream] =
+    useCreateMessageAndStreamMutation();
+
+  const partialResponses = useSelector(selectPartialResponses);
+  const partialResponseStreaming = useSelector(selectPartialResponseStreaming);
 
   const messagesWithLast = lastMessage
-    ? messages.concat({
-        id: "LAST",
-        created_at: Date.now(),
-        content: {
-          content: lastMessage + i18n.t("general.sending"),
-          role: "user",
+    ? [
+        ...messages,
+        {
+          id: "LAST",
+          created_at: Date.now(),
+          content: {
+            content: lastMessage,
+            role: "user",
+          },
         },
-      })
+      ]
     : messages;
 
+  const messagesWithPartial = [
+    ...messagesWithLast,
+    ...(partialResponses[chatId]
+      ? [
+          {
+            id: "PARTIAL",
+            created_at: Date.now(),
+            content: {
+              content: partialResponses[chatId],
+              role: "assistant",
+            },
+          },
+        ]
+      : []),
+  ];
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [messages.length, lastMessage]);
+    if (!isScrollLocked)
+      bottomRef.current?.scrollIntoView({
+        behavior: "instant",
+        block: "start",
+      });
+  }, [messages.length, partialResponses, isScrollLocked]);
 
   useEffect(() => {
     clearLastMessage();
   }, [messages.length]);
+
+  useEffect(() => {
+    if (!partialResponseStreaming[chatId] && partialResponses[chatId]) {
+      console.log("Streaming stopped. Submit it!");
+      setScrollLocked(true);
+      submitResponse({ chatId, message: partialResponses[chatId] }).then(() => {
+        setTimeout(() => {
+          dispatch(
+            setPartialResponse({
+              chatId,
+              content: null,
+            })
+          );
+          setScrollLocked(false);
+        }, 500);
+      });
+    }
+  }, [
+    partialResponses,
+    partialResponseStreaming,
+    chatId,
+    submitResponse,
+    dispatch,
+  ]);
 
   async function handleSend(e) {
     e.preventDefault();
     const mess = messageInput.trim();
     setLastMessage(mess);
     setMessageInput("");
-    await createMessage({ chatId, message: mess });
+    await createMessageAndStream({ chatId, message: mess });
   }
 
   return isLoading ? (
@@ -95,7 +155,7 @@ function ChatContent({ chatId }) {
   ) : (
     <>
       <ChatMessageViewport>
-        {messagesWithLast.map((item) => (
+        {messagesWithPartial.map((item) => (
           <ChatMessage key={item.id} message={item} />
         ))}
         <div ref={bottomRef} />
@@ -135,9 +195,13 @@ function ChatMessage({ message }) {
         <ChatMessageHead>
           {new Date(message.created_at).toLocaleString()}
         </ChatMessageHead>
-        <ChatMessageBody>
-          {message.content.content || "(No response.)"}
-        </ChatMessageBody>
+        <ChatMessageBody
+          dangerouslySetInnerHTML={{
+            __html:
+              message.content.content?.replace(/\n/g, "<br />") ||
+              "(No response.)",
+          }}
+        ></ChatMessageBody>
       </div>
     </ChatMessageTop>
   );
@@ -169,13 +233,19 @@ function App() {
     }
   }, [me, navigate, dispatch]);
 
+  useEffect(() => {
+    if (isError && error.status === 401) {
+      navigate("/login");
+    }
+  }, [isError, error, navigate]);
+
   function handleNewChat() {
     createChat();
   }
 
   return (
     <AppContainer className={Classes.DARK}>
-      <SidePanel isMobile={isMobile} isHidden={isMobile && chatId}>
+      <SidePanel $isMobile={isMobile} $isHidden={isMobile && chatId}>
         <Button
           intent="success"
           className={marginLarge}
@@ -206,7 +276,7 @@ function App() {
         ))}
       </SidePanel>
 
-      <MainPanel isHidden={isMobile && !chatId}>
+      <MainPanel $isHidden={isMobile && !chatId}>
         {isMobile && (
           <TitleWrapper>
             <NavLink to={"/"} className={Classes.BREADCRUMB}>
