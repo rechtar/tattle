@@ -28,6 +28,8 @@ import {
 } from "src/features/global/globalSlice";
 import brainIcon from "src/assets/brain.svg";
 import wonderingIcon from "src/assets/wondering.svg";
+import chatIcon from "src/assets/chat.svg";
+import plusIcon from "src/assets/plus.svg";
 import { i18n } from "src/app/translations";
 import { useIsMobile } from "src/hooks";
 import {
@@ -43,6 +45,11 @@ import {
   marginLarge,
   marginSmall,
   TitleWrapper,
+  ChatIcon,
+  convoItem,
+  convoItemActive,
+  ConvoList,
+  CreateConvo,
 } from "./styles";
 
 function ChatContentPlaceholder() {
@@ -246,34 +253,31 @@ function App() {
   return (
     <AppContainer className={Classes.DARK}>
       <SidePanel $isMobile={isMobile} $isHidden={isMobile && chatId}>
-        <Button
-          intent="success"
-          className={marginLarge}
-          onClick={handleNewChat}
-        >
+        <CreateConvo className={marginLarge} onClick={handleNewChat}>
+          <ChatIcon src={plusIcon} alt="plus icon" />
           {i18n.t("general.new_chat")}
-        </Button>
-        {(chats || []).map((convo) => (
-          <NavLink
-            key={convo.id}
-            className={({ isActive }) =>
-              [
-                Classes.BUTTON,
-                Classes.OUTLINED,
-                isActive ? Classes.ACTIVE : "",
-                marginSmall,
-              ].join(" ")
-            }
-            to={"/chat/" + convo.id}
-            onClick={() => {
-              dispatch(
-                setSelectedChat({ title: convo.content.title, id: convo.id })
-              );
-            }}
-          >
-            {convo.content.title}
-          </NavLink>
-        ))}
+        </CreateConvo>
+        <ConvoList>
+          {(chats || []).map((convo) => (
+            <NavLink
+              key={convo.id}
+              className={({ isActive }) =>
+                [convoItem, isActive ? convoItemActive : "", marginSmall].join(
+                  " "
+                )
+              }
+              to={"/chat/" + convo.id}
+              onClick={() => {
+                dispatch(
+                  setSelectedChat({ title: convo.content.title, id: convo.id })
+                );
+              }}
+            >
+              <ChatIcon src={chatIcon} alt="chat icon" />
+              {convo.content.title}
+            </NavLink>
+          ))}
+        </ConvoList>
       </SidePanel>
 
       <MainPanel $isHidden={isMobile && !chatId}>

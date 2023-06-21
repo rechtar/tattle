@@ -64,7 +64,9 @@ export const marginLarge = css`
   margin-bottom: 20px;
 `;
 export const marginSmall = css`
-  margin-bottom: 10px;
+  &:not(:last-child) {
+    margin-bottom: 10px;
+  }
 `;
 
 export const TitleWrapper = styled("div")({
@@ -73,3 +75,52 @@ export const TitleWrapper = styled("div")({
   alignItems: "center",
   marginBottom: "10px",
 });
+
+export const ChatIcon = styled("img")`
+  width: 18px;
+  margin-right: 10px;
+`;
+
+export const convoItem = css`
+  height: 40px;
+  color: inherit !important;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 5px;
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+`;
+
+export const convoItemActive = css`
+  background: rgba(255, 255, 255, 0.2);
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+`;
+
+export const ConvoList = styled("div")`
+  overflow-y: scroll;
+  flex-grow: 1;
+`;
+
+export const CreateConvo = styled("button")`
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+  background: transparent;
+  transition: none;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 5px;
+  &:hover {
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.05);
+  }
+`;
