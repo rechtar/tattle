@@ -6,24 +6,25 @@ export const AppContainer = styled("div")`
   width: 100vw;
   box-sizing: border-box;
 `;
-export const Panel = styled("div")`
-  display: flex;
+export const Panel = styled("div")(
+  (props) => `
+  display: ${props.$isHidden ? "none" : "flex"};
   flex-direction: column;
   box-sizing: border-box;
   background: #333;
-  border-radius: 2px;
-  margin: 10px;
-  padding: 10px;
-`;
+`
+);
 export const SidePanel = styled(Panel)((props) => ({
+  background: "#202123",
   width: props.$isMobile ? `calc(100% - 20px)` : "300px",
   flexShrink: 0,
-  display: props.$isHidden ? "none" : "?",
+  padding: "10px",
 }));
-export const MainPanel = styled(Panel)((props) => ({
-  flexGrow: 1,
-  display: props.$isHidden ? "none" : "?",
-}));
+export const MainPanel = styled(Panel)`
+  flex-grow: 1;
+  font-size: 16px;
+  line-height: 1.5;
+`;
 export const PlaceholderTop = styled("div")`
   display: flex;
   flex-direction: column;
@@ -34,14 +35,20 @@ export const PlaceholderTop = styled("div")`
 export const ChatMessageViewport = styled("div")`
   flex-grow: 1;
   overflow-y: scroll;
-  margin-bottom: 10px;
 `;
 export const ChatMessageTop = styled("div")`
-  &:not(:first-child) {
-    margin-top: 10px;
+  padding: 20px;
+  justify-content: center;
+  &:last-child {
+    padding-bottom: 10px;
   }
-  margin-bottom: 10px;
   display: flex;
+  &:nth-child(odd) {
+    background: #343540;
+  }
+  &:nth-child(even) {
+    background: #444653;
+  }
 `;
 export const ChatMessageAvatar = styled("div")`
   width: 30px;
@@ -51,13 +58,21 @@ export const ChatMessageAvatar = styled("div")`
   margin-right: 10px;
   flex-shrink: 0;
 `;
+export const ChatMessageWrapper = styled("div")`
+  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+`;
 export const ChatMessageHead = styled("div")`
   margin-bottom: 10px;
 `;
 export const ChatMessageBody = styled("div")`
-  background: #555555;
+  /* background: #555555;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 8px; */
+  padding-top: 2px;
 `;
 
 export const marginLarge = css`

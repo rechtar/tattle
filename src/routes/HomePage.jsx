@@ -42,6 +42,7 @@ import {
   ChatMessageAvatar,
   ChatMessageHead,
   ChatMessageBody,
+  ChatMessageWrapper,
   marginLarge,
   marginSmall,
   TitleWrapper,
@@ -167,17 +168,28 @@ function ChatContent({ chatId }) {
         ))}
         <div ref={bottomRef} />
       </ChatMessageViewport>
-      <form onSubmit={handleSend}>
-        <ControlGroup>
+      <form
+        onSubmit={handleSend}
+        style={{
+          padding: 10,
+          display: "flex",
+          justifyContent: "center",
+          background: "#343540",
+        }}
+      >
+        <ControlGroup style={{ maxWidth: 740, width: "100%" }}>
           <InputGroup
             fill
+            large
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
+            style={{ boxShadow: "0 0 25px 0px rgba(0,0,0,.15)" }}
             rightElement={
               <Button
-                text={i18n.t("general.send")}
                 type="submit"
                 disabled={!messageInput.trim()}
+                minimal
+                icon="send-message"
                 intent={messageInput.trim() ? "primary" : "none"}
               />
             }
@@ -191,25 +203,27 @@ function ChatContent({ chatId }) {
 function ChatMessage({ message }) {
   return (
     <ChatMessageTop>
-      <ChatMessageAvatar>
-        {message.content.role === "user" ? (
-          <img src={wonderingIcon} alt="user icon" />
-        ) : (
-          <img src={brainIcon} alt="ai icon" />
-        )}
-      </ChatMessageAvatar>
-      <div>
-        <ChatMessageHead>
+      <ChatMessageWrapper>
+        <ChatMessageAvatar>
+          {message.content.role === "user" ? (
+            <img src={wonderingIcon} alt="user icon" />
+          ) : (
+            <img src={brainIcon} alt="ai icon" />
+          )}
+        </ChatMessageAvatar>
+        <div>
+          {/* <ChatMessageHead>
           {new Date(message.created_at).toLocaleString()}
-        </ChatMessageHead>
-        <ChatMessageBody
-          dangerouslySetInnerHTML={{
-            __html:
-              message.content.content?.replace(/\n/g, "<br />") ||
-              "(No response.)",
-          }}
-        ></ChatMessageBody>
-      </div>
+        </ChatMessageHead> */}
+          <ChatMessageBody
+            dangerouslySetInnerHTML={{
+              __html:
+                message.content.content?.replace(/\n/g, "<br />") ||
+                "(No response.)",
+            }}
+          ></ChatMessageBody>
+        </div>
+      </ChatMessageWrapper>
     </ChatMessageTop>
   );
 }
@@ -253,7 +267,7 @@ function App() {
   return (
     <AppContainer className={Classes.DARK}>
       <SidePanel $isMobile={isMobile} $isHidden={isMobile && chatId}>
-        <CreateConvo className={marginLarge} onClick={handleNewChat}>
+        <CreateConvo className={marginSmall} onClick={handleNewChat}>
           <ChatIcon src={plusIcon} alt="plus icon" />
           {i18n.t("general.new_chat")}
         </CreateConvo>
