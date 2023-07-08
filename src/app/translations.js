@@ -9,6 +9,7 @@ const translations = {
       new_chat: "New chat",
       welcome: "Welcome to Chat+",
       welcome2: "Select a chat to get started",
+      app_title: "Chat+",
     },
     auth: {
       username: "Username",
@@ -26,8 +27,9 @@ const translations = {
       sending: "（发送中…）",
       my_chat: "我的聊天 ",
       new_chat: "新建聊天",
-      welcome: "欢迎来到 Lived Chat",
+      welcome: "欢迎来到「以聊为生 Lived Chat」",
       welcome2: "新建或选择已有聊天开始吧！",
+      app_title: "以聊为生 Lived Chat",
     },
     auth: {
       username: "用户名",
@@ -42,6 +44,6 @@ const translations = {
 };
 
 export const i18n = new I18n(translations);
-i18n.locale = navigator.language || "en";
-// i18n.locale = "zh";
+// i18n.locale = navigator.language || "en";
+i18n.locale = "zh";
 i18n.enableFallback = true;

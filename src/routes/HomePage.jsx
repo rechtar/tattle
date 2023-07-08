@@ -7,6 +7,7 @@ import {
   InputGroup,
   Icon,
 } from "@blueprintjs/core";
+import { Helmet } from "react-helmet";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -283,6 +284,9 @@ function App() {
 
   return (
     <AppContainer className={Classes.DARK}>
+      <Helmet>
+        <title>{i18n.t("general.app_title")}</title>
+      </Helmet>
       <SidePanel $isMobile={isMobile} $isHidden={isMobile && chatId}>
         <CreateConvo className={marginSmall} onClick={handleNewChat}>
           <ChatIcon src={plusIcon} alt="plus icon" />
