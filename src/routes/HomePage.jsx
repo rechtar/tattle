@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import {
   useGetChatsQuery,
   useCreateChatMutation,
+  useDeleteChatMutation,
   useGetMessagesQuery,
   useCreateMessageMutation,
   useCreateMessageAndStreamMutation,
@@ -30,6 +31,7 @@ import brainIcon from "src/assets/brain.svg";
 import wonderingIcon from "src/assets/wondering.svg";
 import chatIcon from "src/assets/chat.svg";
 import plusIcon from "src/assets/plus.svg";
+import deleteIcon from "src/assets/delete.svg";
 import { i18n } from "src/app/translations";
 import { useIsMobile } from "src/hooks";
 import {
@@ -47,6 +49,7 @@ import {
   marginSmall,
   TitleWrapper,
   ChatIcon,
+  ChatTitle,
   convoItem,
   convoItemActive,
   ConvoList,
@@ -243,6 +246,7 @@ function App() {
     error,
   } = useGetChatsQuery(chatId, { skip: !me?.id });
   const [createChat] = useCreateChatMutation();
+  const [deleteChat] = useDeleteChatMutation();
 
   useEffect(() => {
     if (!me?.id) {
@@ -260,8 +264,21 @@ function App() {
     }
   }, [isError, error, navigate]);
 
-  function handleNewChat() {
-    createChat();
+  async function handleNewChat() {
+    try {
+      const result = await createChat().unwrap();
+      const newChatId = result[0].id;
+      navigate(`/chat/${newChatId}`);
+    } catch (e) {
+      console.error("Error creating a chat", e);
+    }
+  }
+
+  async function handleDeleteChat(e, chatId) {
+    e.stopPropagation();
+    e.preventDefault();
+    await deleteChat({ chatId });
+    navigate("/");
   }
 
   return (
@@ -288,7 +305,17 @@ function App() {
               }}
             >
               <ChatIcon src={chatIcon} alt="chat icon" />
-              {convo.content.title}
+              <ChatTitle>{convo.content.title}</ChatTitle>
+              {chatId === convo.id ? (
+                <ChatIcon
+                  src={deleteIcon}
+                  alt="delete button"
+                  width="14"
+                  height="14"
+                  style={{ marginRight: 0 }}
+                  onClick={(e) => handleDeleteChat(e, convo.id)}
+                />
+              ) : null}
             </NavLink>
           ))}
         </ConvoList>

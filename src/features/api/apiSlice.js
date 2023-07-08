@@ -43,6 +43,15 @@ export const apiSlice = createApi({
       invalidatesTags: [{ type: "Post", id: "LIST" }],
     }),
 
+    deleteChat: builder.mutation({
+      query: ({ chatId }) => ({
+        method: "DELETE",
+        url: `/chat/${chatId}`,
+      }),
+      transformResponse: (response) => response.data,
+      invalidatesTags: [{ type: "Post", id: "LIST" }],
+    }),
+
     getMessages: builder.query({
       query: (chatId) => `/chat/${chatId}`,
       transformResponse: (response) => response.data,
@@ -162,6 +171,7 @@ export const {
   useGetChatsQuery,
   useLazyGetChatsQuery,
   useCreateChatMutation,
+  useDeleteChatMutation,
   useGetMessagesQuery,
   useCreateMessageMutation,
   useSubmitResponseMutation,

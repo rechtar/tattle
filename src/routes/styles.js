@@ -96,6 +96,10 @@ export const ChatIcon = styled("img")`
   margin-right: 10px;
 `;
 
+export const ChatTitle = styled("span")`
+  flex-grow: 1;
+`;
+
 export const convoItem = css`
   height: 40px;
   color: inherit !important;
