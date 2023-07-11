@@ -133,7 +133,7 @@ function ChatContent({ chatId }) {
 
   useEffect(() => {
     if (!partialResponseStreaming[chatId] && partialResponses[chatId]) {
-      console.log("Streaming stopped. Submit it!");
+      // console.log("Streaming stopped. Submit it!");
       setScrollLocked(true);
       submitResponse({ chatId, message: partialResponses[chatId] }).then(() => {
         setTimeout(() => {
@@ -154,6 +154,20 @@ function ChatContent({ chatId }) {
     submitResponse,
     dispatch,
   ]);
+
+  function handleKeyDown(e) {
+    if (e.key === "ArrowUp") {
+      const userMessages = messages.filter((m) => m.content.role === "user");
+      if (userMessages.length) {
+        setMessageInput(userMessages[userMessages.length - 1].content.content);
+      }
+    } else if (e.key === "ArrowDown") {
+      setMessageInput("");
+    } else if (e.ctrlKey && e.key === "k") {
+      e.preventDefault();
+      console.log("Bring up switcher");
+    }
+  }
 
   async function handleSend(e) {
     e.preventDefault();
@@ -188,6 +202,7 @@ function ChatContent({ chatId }) {
             large
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
+            onKeyDownCapture={(e) => handleKeyDown(e)}
             style={{ boxShadow: "0 0 25px 0px rgba(0,0,0,.15)" }}
             rightElement={
               <Button
