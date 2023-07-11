@@ -105,7 +105,8 @@ function ChatContent({ chatId }) {
 
   const messagesWithPartial = [
     ...messagesWithLast,
-    ...(partialResponses[chatId]
+    ...(partialResponses[chatId] &&
+    partialResponses[chatId] !== messages[messages.length - 1]?.content.content
       ? [
           {
             id: "PARTIAL",
