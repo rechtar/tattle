@@ -7,6 +7,7 @@ import {
   InputGroup,
   Icon,
 } from "@blueprintjs/core";
+import { Tooltip } from "react-tooltip";
 import { Helmet } from "react-helmet";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -70,6 +71,7 @@ function ChatContent({ chatId }) {
   const bottomRef = useRef();
   const dispatch = useDispatch();
 
+  const [isTooltipOpen, setTooltipOpen] = useState(false);
   const [messageInput, setMessageInput] = useState("");
   const [lastMessage, setLastMessage] = useState("");
   const [isScrollLocked, setScrollLocked] = useState(false);
@@ -155,7 +157,19 @@ function ChatContent({ chatId }) {
     dispatch,
   ]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (
+        messages.filter((m) => m.content.role === "user").length === 0 &&
+        messageInput === ""
+      ) {
+        setTooltipOpen(true);
+      }
+    }, 20000);
+  }, []);
+
   function handleKeyDown(e) {
+    setTooltipOpen(false);
     if (e.key === "ArrowUp") {
       const userMessages = messages.filter((m) => m.content.role === "user");
       if (userMessages.length) {
@@ -203,6 +217,13 @@ function ChatContent({ chatId }) {
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDownCapture={(e) => handleKeyDown(e)}
+            placeholder={
+              messages.filter((m) => m.content.role === "user").length
+                ? i18n.t("general.press_up")
+                : i18n.t("general.ask_here")
+            }
+            data-tooltip-id="input-tooltip"
+            data-tooltip-content={i18n.t("general.try_asking")}
             style={{ boxShadow: "0 0 25px 0px rgba(0,0,0,.15)" }}
             rightElement={
               <Button
@@ -214,6 +235,7 @@ function ChatContent({ chatId }) {
               />
             }
           />
+          <Tooltip id="input-tooltip" isOpen={isTooltipOpen} />
         </ControlGroup>
       </form>
     </>

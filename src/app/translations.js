@@ -5,6 +5,9 @@ const translations = {
     general: {
       send: "Send",
       sending: " (sending...)",
+      ask_here: "Enter your question here",
+      press_up: "Press Up to bring back last question",
+      try_asking: "Enter your question here",
       my_chat: "My chat ",
       new_chat: "New chat",
       welcome: "Welcome to Chat+",
@@ -25,6 +28,9 @@ const translations = {
     general: {
       send: "发送",
       sending: "（发送中…）",
+      ask_here: "在这里输入你的问题",
+      press_up: "按向上键⬆可恢复上一次输入",
+      try_asking: "试试问小以：腰酸背痛怎么办",
       my_chat: "我的聊天 ",
       new_chat: "新建聊天",
       welcome: "欢迎来到「以聊为生 Lived Chat」",
